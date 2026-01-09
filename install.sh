@@ -2,110 +2,69 @@
 
 # Install required packages
 sudo apt update
-sudo apt install -y nginx jq
+sudo apt install -y nginx
 
-# Get metadata
-HOSTNAME=$(hostname)
-IP_ADDRESS=$(hostname -I | awk '{print $1}')
-OS_VERSION=$(lsb_release -d | cut -f2)
-KERNEL=$(uname -r)
-UPTIME=$(uptime -p)
-CPU_INFO=$(lscpu | grep "Model name" | cut -d':' -f2 | xargs)
-MEMORY=$(free -h | grep Mem | awk '{print $2}')
-DISK=$(df -h / | tail -1 | awk '{print $2}')
-
-# Create HTML page
-sudo tee /var/www/html/index.html > /dev/null <<EOF
+# Create HTML page - Simple Landing Page (No Metadata Exposed)
+sudo tee /var/www/html/index.html > /dev/null <<'EOF'
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Server Metadata - $HOSTNAME</title>
+    <title>Welcome</title>
     <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
         body {
-            font-family: Arial, sans-serif;
-            max-width: 800px;
-            margin: 50px auto;
-            padding: 20px;
-            background-color: #f5f5f5;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
         }
         .container {
-            background-color: white;
-            padding: 30px;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            text-align: center;
+            color: white;
+            padding: 40px;
+        }
+        .icon {
+            font-size: 80px;
+            margin-bottom: 20px;
         }
         h1 {
-            color: #E95420;
-            border-bottom: 3px solid #E95420;
-            padding-bottom: 10px;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            font-weight: 300;
         }
-        .metadata {
-            margin: 20px 0;
+        .tagline {
+            font-size: 1.2em;
+            opacity: 0.9;
+            margin-bottom: 30px;
         }
-        .metadata-item {
-            display: flex;
-            padding: 12px;
-            border-bottom: 1px solid #eee;
-        }
-        .metadata-label {
-            font-weight: bold;
-            width: 150px;
-            color: #333;
-        }
-        .metadata-value {
-            color: #666;
-            flex: 1;
-        }
-        .footer {
-            margin-top: 30px;
-            text-align: center;
-            color: #999;
+        .status {
+            display: inline-block;
+            background: rgba(255,255,255,0.2);
+            padding: 10px 25px;
+            border-radius: 25px;
             font-size: 0.9em;
+        }
+        .status::before {
+            content: "●";
+            color: #4ade80;
+            margin-right: 8px;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>🖥️ Ubuntu Server Metadata</h1>
-        <div class="metadata">
-            <div class="metadata-item">
-                <div class="metadata-label">Hostname:</div>
-                <div class="metadata-value">$HOSTNAME</div>
-            </div>
-            <div class="metadata-item">
-                <div class="metadata-label">IP Address:</div>
-                <div class="metadata-value">$IP_ADDRESS</div>
-            </div>
-            <div class="metadata-item">
-                <div class="metadata-label">OS Version:</div>
-                <div class="metadata-value">$OS_VERSION</div>
-            </div>
-            <div class="metadata-item">
-                <div class="metadata-label">Kernel:</div>
-                <div class="metadata-value">$KERNEL</div>
-            </div>
-            <div class="metadata-item">
-                <div class="metadata-label">Uptime:</div>
-                <div class="metadata-value">$UPTIME</div>
-            </div>
-            <div class="metadata-item">
-                <div class="metadata-label">CPU:</div>
-                <div class="metadata-value">$CPU_INFO</div>
-            </div>
-            <div class="metadata-item">
-                <div class="metadata-label">Total Memory:</div>
-                <div class="metadata-value">$MEMORY</div>
-            </div>
-            <div class="metadata-item">
-                <div class="metadata-label">Disk Size:</div>
-                <div class="metadata-value">$DISK</div>
-            </div>
-        </div>
-        <div class="footer">
-            Generated on $(date '+%Y-%m-%d %H:%M:%S %Z')
-        </div>
+        <div class="icon">🛡️</div>
+        <h1>Secure Cloud Workload</h1>
+        <p class="tagline">Protected by FortiGate on Azure</p>
+        <div class="status">Service Online</div>
     </div>
 </body>
 </html>
@@ -117,5 +76,5 @@ sudo systemctl enable nginx
 
 # Show status
 echo "✅ Web server is running!"
-echo "📍 Access your metadata page at: http://$IP_ADDRESS"
+echo "📍 Access your page at: http://$(hostname -I | awk '{print $1}')"
 sudo systemctl status nginx --no-pager
